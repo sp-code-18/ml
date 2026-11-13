@@ -1,0 +1,34 @@
+import pandas as pd
+import seaborn as sns
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+
+df = sns.load_dataset('titanic')
+print("Original Dataset : \n")
+df.head()
+
+df = df[['survived', 'pclass', 'sex', 'age', 'fare', 'embarked']].copy()
+df
+
+print("\n missing value before preprocessing :")
+df.isnull().sum()
+
+df['age'] = df['age'].fillna(df['age'].median())
+df['embarked'] = df['embarked'].fillna(df['embarked'].mode()[0])
+
+print("\n missing value after preprocessing :")
+df.isnull().sum()
+
+le = LabelEncoder()
+df['sex'] = le.fit_transform(df['sex'])
+
+df = pd.get_dummies(
+    df, columns=['embarked'], dtype=int
+)
+
+scaler = StandardScaler()
+df[['age','fare']] = scaler.fit_transform(df[['age','fare']])
+
+print("cleaned data : ")
+df.head()
+
+df.to_csv('processed_titanic.csv', index=False)
